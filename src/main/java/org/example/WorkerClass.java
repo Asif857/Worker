@@ -5,7 +5,10 @@ import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageResult;
+import net.lingala.zip4j.ZipFile;
 import net.sourceforge.tess4j.Tesseract;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -14,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +35,21 @@ public class WorkerClass {
         this.tesseract = new Tesseract();
         tesseract.setDatapath("/usr/share/tesseract-ocr/4.00/tessdata");
         sqsClient = AmazonSQSClientBuilder.standard().build();
+    }
+    public void setCredentials() throws IOException, GitAPIException {
+        String home = System.getProperty("user.home");
+        Git.cloneRepository()
+                .setURI("https://github.com/Asif857/Worker/blob/master/aws_creds.zip")
+                .setDirectory(Paths.get("/path/to/local/").toFile())
+                .call();
+        String zipFilePath = home + "/IdeaProjects/Worker/src/main/creds";
+        String destDir = home + "/.aws";
+        unzip(zipFilePath, destDir);
+    }
+    private void unzip(String zipFilePath, String destDir) throws IOException {
+        ZipFile zipFile = new ZipFile(zipFilePath);
+        zipFile.setPassword("project1".toCharArray());
+        zipFile.extractAll(destDir);
     }
     private void deleteImage(){
         try {
