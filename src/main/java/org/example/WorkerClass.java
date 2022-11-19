@@ -7,6 +7,7 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageResult;
 import net.lingala.zip4j.ZipFile;
 import net.sourceforge.tess4j.Tesseract;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -39,17 +40,21 @@ public class WorkerClass {
     public void setCredentials() throws IOException, GitAPIException {
         String home = System.getProperty("user.home");
         Git.cloneRepository()
-                .setURI("https://github.com/Asif857/Worker/blob/master/aws_creds.zip")
-                .setDirectory(Paths.get("/path/to/local/").toFile())
+                .setURI("https://github.com/Asif857/NotCreds.git")
+                .setDirectory(Paths.get(home + "/IdeaProjects/Worker/src/main/creds").toFile())
                 .call();
-        String zipFilePath = home + "/IdeaProjects/Worker/src/main/creds";
+        String zipFilePath = home + "/IdeaProjects/Worker/src/main/creds/aws_creds.zip";
         String destDir = home + "/.aws";
         unzip(zipFilePath, destDir);
+        deleteDirectory();
     }
     private void unzip(String zipFilePath, String destDir) throws IOException {
         ZipFile zipFile = new ZipFile(zipFilePath);
         zipFile.setPassword("project1".toCharArray());
         zipFile.extractAll(destDir);
+    }
+    private void deleteDirectory() throws IOException {
+        FileUtils.deleteDirectory(new File("/home/assiph/IdeaProjects/Worker/src/main/creds"));
     }
     private void deleteImage(){
         try {
