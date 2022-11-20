@@ -1,10 +1,8 @@
 package org.example;
 
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sqs.model.MessageAttributeValue;
+import com.amazonaws.services.sqs.model.*;
 import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageResult;
 import net.lingala.zip4j.ZipFile;
 import net.sourceforge.tess4j.Tesseract;
 import org.apache.commons.io.FileUtils;
@@ -25,19 +23,20 @@ import java.util.Map;
 public class WorkerClass {
     private final AmazonSQS sqsClient;
     private String imagePath;
-    private String s3URL;
+    private String imageUrl;
     private String localApplication;
     private final Tesseract tesseract;
     private String imageProcessedText;
     private String error = null;
     private final String processedDataSQSUrl = "https://sqs.us-east-1.amazonaws.com/712064767285/processedDataSQS.fifo";
     private final String managerToWorkerSQSURL = "https://sqs.us-east-1.amazonaws.com/712064767285/managerToWorkerSQS.fifo";
-    public WorkerClass(){
+    public WorkerClass() throws GitAPIException, IOException {
         this.tesseract = new Tesseract();
         tesseract.setDatapath("/usr/share/tesseract-ocr/4.00/tessdata");
+        setCredentials();
         sqsClient = AmazonSQSClientBuilder.standard().build();
     }
-    public void setCredentials() throws IOException, GitAPIException {
+    private void setCredentials() throws IOException, GitAPIException {
         String home = System.getProperty("user.home");
         Git.cloneRepository()
                 .setURI("https://github.com/Asif857/NotCreds.git")
@@ -66,24 +65,28 @@ public class WorkerClass {
             e.printStackTrace();
         }
     }
-    //TODO
-    public void setFromSQS(String SQSUrl){
-        s3URL = "";
-        localApplication = "hey";
+    public Message setFromManagerToWorkerSQS(){
+        ReceiveMessageRequest request = new ReceiveMessageRequest()
+                .withQueueUrl(managerToWorkerSQSURL)
+                .withMaxNumberOfMessages(1)
+                .withMessageAttributeNames("All");
+        Message message = sqsClient.receiveMessage(request).getMessages().get(0);
+        imageUrl = message.getMessageAttributes().get("imageurl").getStringValue();
+        localApplication = message.getMessageAttributes().get("id").getStringValue();
+        return message;
     }
-
     public void bringImage() throws IOException {
-        setFromSQS(managerToWorkerSQSURL);
-        s3URL = "https://stackoverflow.com/questions/53520358/delete-image-from-the-folder";
-        String type = s3URL.substring(s3URL.length() - 3,s3URL.length());
-        URL url = new URL(s3URL);
+        setFromManagerToWorkerSQS();
+        imageUrl = "https://stackoverflow.com/questions/53520358/delete-image-from-the-folder";
+        String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
+        URL url = new URL(imageUrl);
         imagePath = "/home/assiph/IdeaProjects/Worker/src/main/Images/image." + type;
         try {
             BufferedImage img = ImageIO.read(url);
             File file = new File(imagePath);
             ImageIO.write(img, type, file);
         }catch(Exception e){
-            error = s3URL + " " + e.getMessage();
+            error = imageUrl + " " + e.getMessage();
         }
     }
 
@@ -92,7 +95,7 @@ public class WorkerClass {
                 imageProcessedText = tesseract.doOCR(new File(imagePath));
         }
         catch (Exception e) {
-            error = s3URL + " failed because: " + e.getMessage();
+            error = imageUrl + " failed because: " + e.getMessage();
         }
     }
     public void putInSQS(){
@@ -108,14 +111,16 @@ public class WorkerClass {
                 .withDataType("String"));
         SendMessageRequest requestMessageSend = new SendMessageRequest()
                 .withQueueUrl(processedDataSQSUrl)
-                .withMessageBody(s3URL)
+                .withMessageBody(imageUrl)
                 .withMessageAttributes(messageAttributes)
-                .withMessageDeduplicationId(s3URL)
+                .withMessageDeduplicationId(imageUrl)
                 .withMessageGroupId(localApplication);
         SendMessageResult result = sqsClient.sendMessage(requestMessageSend);
         deleteImage();
         System.out.println(result.getMessageId());
     }
-
+    public void deleteMessage(Message message){
+        sqsClient.deleteMessage(managerToWorkerSQSURL,message.getReceiptHandle());
+    }
 
 }
