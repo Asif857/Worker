@@ -54,7 +54,8 @@ public class WorkerClass {
         zipFile.extractAll(destDir);
     }
     private void deleteDirectory() throws IOException {
-        FileUtils.deleteDirectory(new File("/home/assiph/IdeaProjects/Worker/src/main/creds"));
+        String home = System.getProperty("user.home");
+        FileUtils.deleteDirectory(new File(home + "/IdeaProjects/Worker/src/main/creds"));
     }
     private void deleteImage(){
         try {
@@ -75,11 +76,13 @@ public class WorkerClass {
         return message;
     }
     public void bringImage() throws IOException {
+        String home = System.getProperty("user.home");
         Message message = getFromManagerToWorkerSQS();
         updateFromMessage(message);
         String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
         URL url = new URL(imageUrl);
-        imagePath = "/home/assiph/IdeaProjects/Worker/src/main/Images/image." + type;
+
+        imagePath = home + "/IdeaProjects/Worker/src/main/Images/image." + type;
         try {
             BufferedImage img = ImageIO.read(url);
             File file = new File(imagePath);
