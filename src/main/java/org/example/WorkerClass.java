@@ -75,8 +75,8 @@ public class WorkerClass {
         return message;
     }
     public void bringImage() throws IOException {
-        getFromManagerToWorkerSQS();
-        imageUrl = "https://stackoverflow.com/questions/53520358/delete-image-from-the-folder";
+        Message message = getFromManagerToWorkerSQS();
+        updateFromMessage(message);
         String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
         URL url = new URL(imageUrl);
         imagePath = "/home/assiph/IdeaProjects/Worker/src/main/Images/image." + type;
