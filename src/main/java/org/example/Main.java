@@ -6,10 +6,11 @@ public class Main {
     public static void main(String[] args) throws Exception {
         WorkerClass work = new WorkerClass();
         while (true) {
-            Message message = work.setFromManagerToWorkerSQS();
+            Message message = work.getFromManagerToWorkerSQS();
+            work.updateFromMessage(message);
             work.bringImage();
             work.processImage();
-            work.putInSQS();
+            work.sendToManager();
             work.deleteMessage(message);
         }
     }

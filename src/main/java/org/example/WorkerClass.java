@@ -28,6 +28,7 @@ public class WorkerClass {
     private final Tesseract tesseract;
     private String imageProcessedText;
     private String error = null;
+    private String eof;
     private final String processedDataSQSUrl = "https://sqs.us-east-1.amazonaws.com/712064767285/processedDataSQS.fifo";
     private final String managerToWorkerSQSURL = "https://sqs.us-east-1.amazonaws.com/712064767285/managerToWorkerSQS.fifo";
     public WorkerClass() throws GitAPIException, IOException {
@@ -65,18 +66,16 @@ public class WorkerClass {
             e.printStackTrace();
         }
     }
-    public Message setFromManagerToWorkerSQS(){
+    public Message getFromManagerToWorkerSQS(){
         ReceiveMessageRequest request = new ReceiveMessageRequest()
                 .withQueueUrl(managerToWorkerSQSURL)
                 .withMaxNumberOfMessages(1)
                 .withMessageAttributeNames("All");
         Message message = sqsClient.receiveMessage(request).getMessages().get(0);
-        imageUrl = message.getMessageAttributes().get("imageurl").getStringValue();
-        localApplication = message.getMessageAttributes().get("id").getStringValue();
         return message;
     }
     public void bringImage() throws IOException {
-        setFromManagerToWorkerSQS();
+        getFromManagerToWorkerSQS();
         imageUrl = "https://stackoverflow.com/questions/53520358/delete-image-from-the-folder";
         String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
         URL url = new URL(imageUrl);
@@ -98,15 +97,13 @@ public class WorkerClass {
             error = imageUrl + " failed because: " + e.getMessage();
         }
     }
-    public void putInSQS(){
-        String messageType = "Message";
+    public void sendToManager(){
         String messageValue = imageProcessedText;
         if (error != null){
-            messageType = "ERROR";
             messageValue = error;
         }
         Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
-        messageAttributes.put(messageType, new MessageAttributeValue()
+        messageAttributes.put("message", new MessageAttributeValue()
                 .withStringValue(messageValue)
                 .withDataType("String"));
         SendMessageRequest requestMessageSend = new SendMessageRequest()
@@ -119,8 +116,16 @@ public class WorkerClass {
         deleteImage();
         System.out.println(result.getMessageId());
     }
+
+
+
     public void deleteMessage(Message message){
         sqsClient.deleteMessage(managerToWorkerSQSURL,message.getReceiptHandle());
     }
 
+    public void updateFromMessage(Message message) {
+        imageUrl = message.getMessageAttributes().get("imageurl").getStringValue();
+        localApplication = message.getMessageAttributes().get("id").getStringValue();
+        eof = message.getMessageAttributes().get("eof").getStringValue();
+    }
 }
