@@ -7,11 +7,13 @@ public class Main {
         WorkerClass work = new WorkerClass();
         while (true) {
             Message message = work.getFromManagerToWorkerSQS();
-            work.updateFromMessage(message);
-            work.bringImage();
-            work.processImage();
-            work.sendToManager();
-            work.deleteMessage(message);
+            if (message != null) {
+                work.updateFromMessage(message);
+                work.bringImage();
+                work.processImage();
+                work.sendToManager();
+                work.deleteMessage(message);
+            }
         }
     }
 }

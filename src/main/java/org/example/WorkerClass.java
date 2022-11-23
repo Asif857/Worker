@@ -8,7 +8,6 @@ import net.sourceforge.tess4j.Tesseract;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -18,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WorkerClass {
@@ -72,7 +72,11 @@ public class WorkerClass {
                 .withQueueUrl(managerToWorkerSQSURL)
                 .withMaxNumberOfMessages(1)
                 .withMessageAttributeNames("All");
-        Message message = sqsClient.receiveMessage(request).getMessages().get(0);
+        List<Message> messages = sqsClient.receiveMessage(request).getMessages();
+        Message message = null;
+        if (messages.size() > 0){
+            message = messages.get(0);
+        }
         return message;
     }
     public void bringImage() throws IOException {
