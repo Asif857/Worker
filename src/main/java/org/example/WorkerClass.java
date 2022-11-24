@@ -79,13 +79,11 @@ public class WorkerClass {
         }
         return message;
     }
-    public void bringImage() throws IOException {
+    public void bringImage(Message message) throws IOException {
         String home = System.getProperty("user.home");
-        Message message = getFromManagerToWorkerSQS();
         updateFromMessage(message);
         String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
         URL url = new URL(imageUrl);
-
         imagePath = home + "/IdeaProjects/Worker/src/main/Images/image." + type;
         try {
             BufferedImage img = ImageIO.read(url);
@@ -113,6 +111,12 @@ public class WorkerClass {
         messageAttributes.put("message", new MessageAttributeValue()
                 .withStringValue(messageValue)
                 .withDataType("String"));
+        messageAttributes.put("eof", new MessageAttributeValue()
+                .withStringValue(eof)
+                .withDataType("String"));
+        messageAttributes.put("id", new MessageAttributeValue()
+                .withStringValue(localApplication)
+                .withDataType("String"));
         SendMessageRequest requestMessageSend = new SendMessageRequest()
                 .withQueueUrl(processedDataSQSUrl)
                 .withMessageBody(imageUrl)
@@ -128,6 +132,7 @@ public class WorkerClass {
 
     public void deleteMessage(Message message){
         sqsClient.deleteMessage(managerToWorkerSQSURL,message.getReceiptHandle());
+
     }
 
     public void updateFromMessage(Message message) {

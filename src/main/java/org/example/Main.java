@@ -9,8 +9,7 @@ public class Main {
             System.out.println("works");
             Message message = work.getFromManagerToWorkerSQS();
             if (message != null) {
-                work.updateFromMessage(message);
-                work.bringImage();
+                work.bringImage(message);
                 work.processImage();
                 work.sendToManager();
                 work.deleteMessage(message);
