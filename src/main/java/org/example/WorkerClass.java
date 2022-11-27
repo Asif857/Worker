@@ -108,6 +108,7 @@ public class WorkerClass {
             messageValue = error;
         }
         Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
+        System.out.println("EOF message value sent: "+eof);
         messageAttributes.put("message", new MessageAttributeValue()
                 .withStringValue(messageValue)
                 .withDataType("String"));
@@ -125,7 +126,6 @@ public class WorkerClass {
                 .withMessageGroupId(localApplication);
         SendMessageResult result = sqsClient.sendMessage(requestMessageSend);
         deleteImage();
-        System.out.println(result.getMessageId());
     }
 
 
@@ -139,5 +139,6 @@ public class WorkerClass {
         imageUrl = message.getMessageAttributes().get("imageurl").getStringValue();
         localApplication = message.getMessageAttributes().get("id").getStringValue();
         eof = message.getMessageAttributes().get("eof").getStringValue();
+        System.out.println("eof value: "+eof);
     }
 }
