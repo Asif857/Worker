@@ -122,7 +122,7 @@ public class WorkerClass {
                 .withQueueUrl(processedDataSQSUrl)
                 .withMessageBody(imageUrl)
                 .withMessageAttributes(messageAttributes)
-                .withMessageDeduplicationId(imageUrl)
+                .withMessageDeduplicationId(imageUrl+localApplication)
                 .withMessageGroupId(localApplication);
         SendMessageResult result = sqsClient.sendMessage(requestMessageSend);
         deleteImage();
