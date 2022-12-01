@@ -5,6 +5,7 @@ import com.amazonaws.services.sqs.model.*;
 import com.amazonaws.services.sqs.AmazonSQS;
 import net.lingala.zip4j.ZipFile;
 import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.util.LoadLibs;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -33,6 +34,8 @@ public class WorkerClass {
     private final String managerToWorkerSQSURL = "https://sqs.us-east-1.amazonaws.com/712064767285/managerToWorkerSQS.fifo";
     public WorkerClass() throws GitAPIException, IOException {
         this.tesseract = new Tesseract();
+        File tmpFolder = LoadLibs.extractTessResources("linux-x86-64");
+        System.setProperty("java.library.path", tmpFolder.getPath());
         tesseract.setDatapath("/tessdata");
         setCredentials();
         sqsClient = AmazonSQSClientBuilder.standard().build();
