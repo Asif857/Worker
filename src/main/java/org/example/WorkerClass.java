@@ -92,9 +92,11 @@ public class WorkerClass {
             BufferedImage img = ImageIO.read(url);
             file = new File(imagePath);
             ImageIO.write(img, type, file);
+            return file;
 
         }catch(Exception e){
             error = imageUrl + " " + e.getMessage();
+            System.out.println("failed bringing image");
         }
         return file;
     }
