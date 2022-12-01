@@ -80,24 +80,27 @@ public class WorkerClass {
         }
         return message;
     }
-    public void bringImage(Message message) throws IOException {
+    public File bringImage(Message message) throws IOException {
         String home = System.getProperty("user.home");
         updateFromMessage(message);
         String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
         URL url = new URL(imageUrl);
 
         imagePath = home + "/image." + type;
+        File file = null;
         try {
             BufferedImage img = ImageIO.read(url);
-            File file = new File(imagePath);
+            file = new File(imagePath);
             ImageIO.write(img, type, file);
+
         }catch(Exception e){
             error = imageUrl + " " + e.getMessage();
         }
+        return file;
     }
-    public void processImage() throws Exception{
+    public void processImage(File image) throws Exception{
         try {
-                imageProcessedText = tesseract.doOCR(new File(imagePath));
+                imageProcessedText = tesseract.doOCR(image);
         }
         catch (Exception e) {
             error = imageUrl + " failed because: " + e.getMessage();
