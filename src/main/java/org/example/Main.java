@@ -22,7 +22,7 @@ public class Main {
        Tesseract tesseract = new Tesseract();
        tesseract.setDatapath("/tessdata");
        String home = System.getProperty("user.home");
-       String imageProcessedText = tesseract.doOCR(new File(home + "/IdeaProjects/Worker/src/main/Images/ocraextended.png"));
+       String imageProcessedText = tesseract.doOCR(new File(home + "/main/Images/ocraextended.png"));
        System.out.println(imageProcessedText);
 
 
