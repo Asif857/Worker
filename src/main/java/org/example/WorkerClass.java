@@ -5,6 +5,7 @@ import com.amazonaws.services.sqs.model.*;
 import com.amazonaws.services.sqs.AmazonSQS;
 import net.lingala.zip4j.ZipFile;
 import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.util.LoadLibs;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -32,6 +33,8 @@ public class WorkerClass {
     private final String processedDataSQSUrl = "https://sqs.us-east-1.amazonaws.com/712064767285/processedDataSQS.fifo";
     private final String managerToWorkerSQSURL = "https://sqs.us-east-1.amazonaws.com/712064767285/managerToWorkerSQS.fifo";
     public WorkerClass() throws GitAPIException, IOException {
+        File tmpFolder = LoadLibs.extractTessResources("linux-x86-64"); // replace platform
+        System.setProperty("java.library.path", tmpFolder.getPath());
         String home = System.getProperty("user.home");
         this.tesseract = new Tesseract();
         tesseract.setDatapath(home + "/tessdata");
@@ -85,7 +88,6 @@ public class WorkerClass {
         updateFromMessage(message);
         String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
         URL url = new URL(imageUrl);
-
         imagePath = home + "/image." + type;
         File file = null;
         try {
@@ -96,7 +98,6 @@ public class WorkerClass {
 
         }catch(Exception e){
             error = imageUrl + " " + e.getMessage();
-            System.out.println("failed bringing image");
         }
         return file;
     }

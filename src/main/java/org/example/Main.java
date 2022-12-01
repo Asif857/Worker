@@ -22,16 +22,14 @@ public class Main {
         }
 
 
-
-
-
-       /* Tesseract tesseract = new Tesseract();
-       tesseract.setDatapath("/tessdata");
+      /* WorkerClass work = new WorkerClass();
+       System.out.println(System.getProperty("jna.library.path"));
        String home = System.getProperty("user.home");
-       String imageProcessedText = tesseract.doOCR(new File(home + "/Images/ocraextended.png"));
-       System.out.println(imageProcessedText);
-       */
+       //System.out.println(imageProcessedText);
 
+
+
+       */
 
     }
     /*public static void bringImage(Message message) throws IOException {
