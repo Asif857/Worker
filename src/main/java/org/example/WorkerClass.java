@@ -32,8 +32,9 @@ public class WorkerClass {
     private final String processedDataSQSUrl = "https://sqs.us-east-1.amazonaws.com/712064767285/processedDataSQS.fifo";
     private final String managerToWorkerSQSURL = "https://sqs.us-east-1.amazonaws.com/712064767285/managerToWorkerSQS.fifo";
     public WorkerClass() throws GitAPIException, IOException {
+        String home = System.getProperty("user.home");
         this.tesseract = new Tesseract();
-        tesseract.setDatapath("/tessdata");
+        tesseract.setDatapath(home + "/tessdata");
         setCredentials();
         sqsClient = AmazonSQSClientBuilder.standard().build();
     }
@@ -127,9 +128,6 @@ public class WorkerClass {
         SendMessageResult result = sqsClient.sendMessage(requestMessageSend);
        // deleteImage();
     }
-
-
-
     public void deleteMessage(Message message){
         sqsClient.deleteMessage(managerToWorkerSQSURL,message.getReceiptHandle());
 
