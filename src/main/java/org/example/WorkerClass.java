@@ -86,7 +86,7 @@ public class WorkerClass {
         String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
         URL url = new URL(imageUrl);
 
-        imagePath = home + "/Images/image." + type;
+        imagePath = home + "/image." + type;
         try {
             BufferedImage img = ImageIO.read(url);
             File file = new File(imagePath);
