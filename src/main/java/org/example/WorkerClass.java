@@ -84,7 +84,8 @@ public class WorkerClass {
         updateFromMessage(message);
         String type = imageUrl.substring(imageUrl.length() - 3, imageUrl.length());
         URL url = new URL(imageUrl);
-        imagePath = home + "/IdeaProjects/Worker/src/main/Images/image." + type;
+
+        imagePath = home + "/Images/image." + type;
         try {
             BufferedImage img = ImageIO.read(url);
             File file = new File(imagePath);
@@ -93,7 +94,6 @@ public class WorkerClass {
             error = imageUrl + " " + e.getMessage();
         }
     }
-
     public void processImage() throws Exception{
         try {
                 imageProcessedText = tesseract.doOCR(new File(imagePath));
@@ -125,7 +125,7 @@ public class WorkerClass {
                 .withMessageDeduplicationId(imageUrl+localApplication)
                 .withMessageGroupId(localApplication);
         SendMessageResult result = sqsClient.sendMessage(requestMessageSend);
-        deleteImage();
+       // deleteImage();
     }
 
 

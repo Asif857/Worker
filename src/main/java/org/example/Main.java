@@ -7,7 +7,7 @@ import java.io.File;
 
 public class Main {
    public static void main(String[] args) throws Exception {
-        /*WorkerClass work = new WorkerClass();
+        WorkerClass work = new WorkerClass();
         while (true) {
             Message message = work.getFromManagerToWorkerSQS();
             if (message != null) {
@@ -17,13 +17,12 @@ public class Main {
                 work.deleteMessage(message);
             }
         }
-
-         */
-       Tesseract tesseract = new Tesseract();
+       /* Tesseract tesseract = new Tesseract();
        tesseract.setDatapath("/tessdata");
        String home = System.getProperty("user.home");
-       String imageProcessedText = tesseract.doOCR(new File(home + "/main/Images/ocraextended.png"));
+       String imageProcessedText = tesseract.doOCR(new File(home + "/Images/ocraextended.png"));
        System.out.println(imageProcessedText);
+       */
 
 
     }
