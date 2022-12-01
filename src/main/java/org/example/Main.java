@@ -14,8 +14,8 @@ public class Main {
         while (true) {
             Message message = work.getFromManagerToWorkerSQS();
             if (message != null) {
-                File image = work.bringImage(message);
-                work.processImage(image);
+                work.bringImage(message);
+                work.processImage();
                 work.sendToManager();
                 work.deleteMessage(message);
             }
