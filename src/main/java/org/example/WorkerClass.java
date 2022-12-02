@@ -139,7 +139,7 @@ public class WorkerClass {
                 .withMessageDeduplicationId(imageUrl+localApplication)
                 .withMessageGroupId(localApplication);
         SendMessageResult result = sqsClient.sendMessage(requestMessageSend);
-       // deleteImage();
+       deleteImage();
     }
 
 
