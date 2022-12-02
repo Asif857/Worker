@@ -3,6 +3,7 @@ package org.example;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.*;
 import com.amazonaws.services.sqs.AmazonSQS;
+import com.asprise.ocr.Ocr;
 import net.lingala.zip4j.ZipFile;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.util.LoadLibs;
@@ -27,6 +28,8 @@ public class WorkerClass {
     private String imageUrl;
     private String localApplication;
     private final Tesseract tesseract;
+
+    private final Ocr ocr;
     private String imageProcessedText;
     private String error = null;
     private String eof;
@@ -34,6 +37,8 @@ public class WorkerClass {
     private final String managerToWorkerSQSURL = "https://sqs.us-east-1.amazonaws.com/712064767285/managerToWorkerSQS.fifo";
     public WorkerClass() throws GitAPIException, IOException {
         this.tesseract = new Tesseract();
+        Ocr.setUp();
+        ocr = new Ocr();
         //tesseract.setDatapath("/tessdata");
         setCredentials();
         sqsClient = AmazonSQSClientBuilder.standard().build();
@@ -95,13 +100,21 @@ public class WorkerClass {
         }
     }
 
-    public void processImage() throws Exception{
+    public void processImage2() throws Exception{
         try {
                 imageProcessedText = tesseract.doOCR(new File(imagePath));
         }
         catch (Exception e) {
             error = imageUrl + " failed because: " + e.getMessage();
         }
+    }
+
+    public void processImage(){
+        ocr.startEngine("eng",Ocr.SPEED_FASTEST);
+        imageProcessedText = ocr.recognize(new File[]{new File(imagePath)},Ocr.RECOGNIZE_TYPE_ALL,Ocr.OUTPUT_FORMAT_PLAINTEXT);
+        if(imageProcessedText == null)
+            error = imageUrl + "OCR was not able to extract text from this image";
+        ocr.stopEngine();
     }
     public void sendToManager(){
         String messageValue = imageProcessedText;
