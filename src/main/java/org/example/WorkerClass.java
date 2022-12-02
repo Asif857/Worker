@@ -112,8 +112,8 @@ public class WorkerClass {
     public void processImage(){
         ocr.startEngine("eng",Ocr.SPEED_FASTEST);
         imageProcessedText = ocr.recognize(new File[]{new File(imagePath)},Ocr.RECOGNIZE_TYPE_ALL,Ocr.OUTPUT_FORMAT_PLAINTEXT);
-        if(imageProcessedText == null)
-            error = imageUrl + "OCR was not able to extract text from this image";
+        if(imageProcessedText == null || imageProcessedText.strip() == "")
+            error = imageUrl + " OCR was not able to extract text from this image";
         ocr.stopEngine();
     }
     public void sendToManager(){
@@ -122,7 +122,6 @@ public class WorkerClass {
             messageValue = error;
         }
         Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
-        System.out.println("EOF message value sent: "+eof);
         messageAttributes.put("message", new MessageAttributeValue()
                 .withStringValue(messageValue)
                 .withDataType("String"));
@@ -139,7 +138,7 @@ public class WorkerClass {
                 .withMessageDeduplicationId(imageUrl+localApplication)
                 .withMessageGroupId(localApplication);
         SendMessageResult result = sqsClient.sendMessage(requestMessageSend);
-       deleteImage();
+       //deleteImage();
     }
 
 
@@ -153,6 +152,5 @@ public class WorkerClass {
         imageUrl = message.getMessageAttributes().get("imageurl").getStringValue();
         localApplication = message.getMessageAttributes().get("id").getStringValue();
         eof = message.getMessageAttributes().get("eof").getStringValue();
-        System.out.println("eof value: "+eof);
     }
 }
