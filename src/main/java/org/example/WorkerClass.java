@@ -96,7 +96,8 @@ public class WorkerClass {
 
     public void processImage() throws Exception{
         try {
-                imageProcessedText = tesseract.doOCR(new File(imagePath));
+            String inlinedText = tesseract.doOCR(new File(imagePath));
+            imageProcessedText = inlinedText.replaceAll("\\R", " ");
         }
         catch (Exception e) {
             error = imageUrl + " failed because: " + e.getMessage();
