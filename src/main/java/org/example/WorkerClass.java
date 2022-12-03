@@ -33,7 +33,7 @@ public class WorkerClass {
     private final String managerToWorkerSQSURL = "https://sqs.us-east-1.amazonaws.com/712064767285/managerToWorkerSQS.fifo";
     public WorkerClass() throws GitAPIException, IOException {
         this.tesseract = new Tesseract();
-        tesseract.setDatapath("/tesseract-ocr");
+        tesseract.setDatapath("/usr/local/share/tessdata/");
         setCredentials();
         sqsClient = AmazonSQSClientBuilder.standard().build();
     }
