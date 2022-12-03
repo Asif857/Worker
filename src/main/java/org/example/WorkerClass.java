@@ -100,6 +100,7 @@ public class WorkerClass {
         }
         catch (Exception e) {
             error = imageUrl + " failed because: " + e.getMessage();
+            System.out.println(error);
         }
     }
     public void sendToManager(){
